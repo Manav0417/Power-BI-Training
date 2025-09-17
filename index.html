@@ -1,0 +1,607 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Interactive Power BI Training Hub</title>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <!-- Chosen Palette: Warm Neutrals with a Blue Accent -->
+        <!-- Application Structure Plan: A sidebar navigation SPA. This structure replaces the linear PPT format with a user-driven, non-linear experience. Users can freely jump between modules, which is ideal for both initial learning and later reference. Key concepts like the BI workflow, DAX comparisons, and visual selection are converted into interactive elements to improve knowledge retention over passive reading. This design prioritizes usability and active learning. -->
+        <!-- Visualization & Content Choices:
+            - Agenda -> Sidebar Navigation -> Click Interaction -> Replaces static agenda, provides constant context and control. (HTML/JS)
+            - Power BI Workflow -> Interactive Diagram -> Click to reveal details -> Makes the process more engaging than a list. (HTML/JS)
+            - DAX Comparison -> Side-by-side interactive cards -> Hover/Click Interaction -> Enhances direct comparison. (HTML/JS)
+            - Visual Chooser -> Interactive Tool with Chart.js -> Click button for a goal, see suggested visual -> Active learning tool instead of a static list. (HTML/JS/Chart.js)
+            - Hands-on Lab -> Interactive Checklist with Progress Bar -> Click to check off items -> Provides a sense of accomplishment. (HTML/JS)
+        -->
+        <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+        <style>
+            body {
+                font-family: 'Inter', sans-serif;
+            }
+            @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+            .content-fade-in {
+                animation: fadeIn 0.5s ease-in-out;
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .sidebar-item.active {
+                background-color: #16a34a;
+                color: white;
+                font-weight: 600;
+            }
+            .chart-container {
+                position: relative;
+                width: 100%;
+                max-width: 500px;
+                margin-left: auto;
+                margin-right: auto;
+                height: 300px;
+                max-height: 350px;
+            }
+            .workflow-step { transition: all 0.3s ease; }
+            .workflow-step:hover { transform: translateY(-5px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+            .comparison-card { transition: all 0.3s ease; }
+            .comparison-card:hover { transform: scale(1.03); }
+            .task-list-item input:checked + span {
+                text-decoration: line-through;
+                color: #6b7280;
+            }
+            .logo-placeholder {
+                width: 80px;
+                height: 80px;
+                background: linear-gradient(135deg, #10b981, #34d399);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 28px;
+                font-weight: bold;
+                color: white;
+                margin: 0 auto 16px auto;
+            }
+            .logo-image {
+                width: 80px;
+                height: 80px;
+                object-fit: contain;
+                border-radius: 12px;
+                margin: 0 auto 16px auto;
+                display: block;
+                background: transparent;
+                mix-blend-mode: screen;
+            }
+            
+            /* Sidebar navigation styles */
+            .sidebar-item {
+                white-space: nowrap;
+                overflow: hidden;
+            }
+            
+            .nav-text {
+                display: inline-block;
+            }
+            
+            /* Sidebar collapsed styles */
+            .sidebar-collapsed {
+                width: 80px !important;
+            }
+            
+            .sidebar-collapsed .logo-image {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .sidebar-collapsed .logo-placeholder {
+                width: 40px;
+                height: 40px;
+                font-size: 14px;
+            }
+            
+            .sidebar-collapsed .nav-text,
+            .sidebar-collapsed #sidebar-text {
+                opacity: 0;
+                visibility: hidden;
+            }
+            
+            .sidebar-collapsed .sidebar-item {
+                text-align: center;
+                padding-left: 1rem;
+                padding-right: 1rem;
+            }
+            
+            .sidebar-collapsed .nav-icon {
+                margin-right: 0 !important;
+            }
+            
+            .sidebar-collapsed #toggle-icon {
+                transform: rotate(180deg);
+            }
+        </style>
+    </head>
+    <body class="bg-gray-900 text-gray-200">
+
+        <div class="flex h-screen">
+            <!-- Sidebar Navigation -->
+            <aside id="sidebar" class="w-72 bg-gradient-to-b from-gray-900 to-black shadow-lg flex-shrink-0 transition-all duration-300">
+                <div class="p-6 text-center relative">
+                    <!-- Toggle Button -->
+                    <button id="toggle-sidebar" class="absolute top-4 right-4 text-gray-400 hover:text-green-400 transition-colors z-10">
+                        <svg id="toggle-icon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    
+                    <!-- Logo with fallback - Same folder as HTML file -->
+                    <img id="cosmos-logo" src="Cosmos.gif" alt="Cosmos Logo" class="logo-image transition-all duration-300" style="display: none;">
+                    <div id="logo-fallback" class="logo-placeholder transition-all duration-300">COSMOS</div>
+                    <div id="sidebar-text" class="transition-opacity duration-300">
+                        <h1 class="text-xl font-bold text-green-400">Power BI Training</h1>
+                        <p class="text-sm text-gray-400">From Beginner to Pro</p>
+                    </div>
+                </div>
+                <nav id="sidebar-nav" class="mt-4">
+                    <a href="#module1" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">📚</span>
+                        <span class="nav-text">Module 1: The Basics</span>
+                    </a>
+                    <a href="#module2" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">📊</span>
+                        <span class="nav-text">Module 2: Get Data</span>
+                    </a>
+                    <a href="#module3" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">🔧</span>
+                        <span class="nav-text">Module 3: Data Modeling</span>
+                    </a>
+                    <a href="#module4" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">📈</span>
+                        <span class="nav-text">Module 4: Visualization</span>
+                    </a>
+                    <a href="#module5" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">🚀</span>
+                        <span class="nav-text">Module 5: Sharing Insights</span>
+                    </a>
+                    <a href="#lab" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">⚡</span>
+                        <span class="nav-text">Hands-On Lab</span>
+                    </a>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+                <div id="content-area">
+                    <!-- Content will be injected here by JavaScript -->
+                </div>
+            </main>
+        </div>
+
+    <script>
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const toggleBtn = document.getElementById('toggle-sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+        let isCollapsed = false;
+
+        toggleBtn.addEventListener('click', () => {
+            isCollapsed = !isCollapsed;
+            
+            if (isCollapsed) {
+                sidebar.classList.add('sidebar-collapsed');
+            } else {
+                sidebar.classList.remove('sidebar-collapsed');
+            }
+        });
+
+        // Logo handling
+        const logoImg = document.getElementById('cosmos-logo');
+        const logoFallback = document.getElementById('logo-fallback');
+        
+        logoImg.onload = function() {
+            logoImg.style.display = 'block';
+            logoFallback.style.display = 'none';
+        };
+        
+        logoImg.onerror = function() {
+            logoImg.style.display = 'none';
+            logoFallback.style.display = 'flex';
+        };
+
+        const content = {
+            module1: `
+                <div id="module1" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Module 1: The "What" and "Why" of Power BI</h2>
+                    <p class="text-lg text-gray-400 mb-8">This section introduces the core concepts behind Business Intelligence and the Power BI ecosystem. Understanding the 'why' is just as important as the 'how'.</p>
+                    
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">What is Business Intelligence (BI)?</h3>
+                        <p class="mb-4">BI is the process of using technology to analyze data and present actionable information to help business users make more informed decisions. It's about transforming raw, messy data into clear, interactive charts that tell a story.</p>
+                        <div class="flex items-center justify-around text-center p-4 bg-gray-900 rounded-lg">
+                            <span class="text-2xl">📊</span>
+                            <span class="text-xl text-gray-500 font-light">➡️</span>
+                            <span class="text-2xl">📈</span>
+                            <span class="text-xl text-gray-500 font-light">➡️</span>
+                            <span class="text-2xl">💡</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">The Power BI Ecosystem</h3>
+                        <p class="mb-4">Power BI isn't just one application; it's a collection of services that work together to bring your data to life.</p>
+                        <ul class="space-y-4">
+                            <li class="p-4 bg-gray-700 rounded-lg border-l-4 border-green-500">
+                                <strong class="block text-green-300">1. Power BI Desktop</strong>
+                                The free Windows application for designing and building reports. This is where the magic begins.
+                            </li>
+                            <li class="p-4 bg-gray-700 rounded-lg border-l-4 border-green-500">
+                                <strong class="block text-green-300">2. Power BI Service</strong>
+                                The cloud-based service (app.powerbi.com) for publishing, sharing, and collaborating on your reports and dashboards.
+                            </li>
+                            <li class="p-4 bg-gray-700 rounded-lg border-l-4 border-green-500">
+                                <strong class="block text-green-300">3. Power BI Mobile</strong>
+                                The companion apps for viewing your interactive reports on any device, anywhere.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            module2: `
+                <div id="module2" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Module 2: Getting Your Hands Dirty</h2>
+                    <p class="text-lg text-gray-400 mb-8">This module covers the first crucial steps in any Power BI project: connecting to data and cleaning it up for analysis using the Power Query Editor.</p>
+
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+                        <h3 class="text-xl font-semibold text-green-400 mb-4">The Power BI Workflow</h3>
+                        <p class="mb-6">Follow this simple, repeatable process for every report you build. Click each step to learn more.</p>
+                        <div class="grid grid-cols-1 md:grid-cols-5 gap-4 text-center">
+                            <div id="step-1" class="workflow-step bg-gray-700 p-4 rounded-lg cursor-pointer"><strong>1. Get Data</strong></div>
+                            <div id="step-2" class="workflow-step bg-gray-700 p-4 rounded-lg cursor-pointer"><strong>2. Transform</strong></div>
+                            <div id="step-3" class="workflow-step bg-gray-700 p-4 rounded-lg cursor-pointer"><strong>3. Model</strong></div>
+                            <div id="step-4" class="workflow-step bg-gray-700 p-4 rounded-lg cursor-pointer"><strong>4. Visualize</strong></div>
+                            <div id="step-5" class="workflow-step bg-gray-700 p-4 rounded-lg cursor-pointer"><strong>5. Publish</strong></div>
+                        </div>
+                        <div id="workflow-details" class="mt-4 p-4 bg-gray-700 rounded-lg border-l-4 border-green-500 hidden"></div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                            <h3 class="text-xl font-semibold text-green-400 mb-3">Connecting to Data Sources</h3>
+                            <p>Power BI can connect to hundreds of sources. The most common ones you'll use are:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>Excel Workbooks</li>
+                                <li>SQL Server Databases</li>
+                                <li>Text/CSV files</li>
+                                <li>Data from Web Pages</li>
+                            </ul>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                            <h3 class="text-xl font-semibold text-green-400 mb-3">Intro to Power Query Editor</h3>
+                            <p>This is the "kitchen" where you prepare data. Key actions include:</p>
+                            <ul class="list-disc list-inside mt-2 space-y-1">
+                                <li>Remove unneeded columns/rows</li>
+                                <li>Change data types (e.g., text to number)</li>
+                                <li>Replace values to correct errors</li>
+                                <li>Split columns (e.g., Full Name to First/Last)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            `,
+            module3: `
+                <div id="module3" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Module 3: Shaping Your Data with Modeling & DAX</h2>
+                    <p class="text-lg text-gray-400 mb-8">Here, we move from data preparation to data intelligence. A good data model is the foundation of your report, and DAX is the tool to build powerful calculations on top of it.</p>
+                    
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">What is a Data Model?</h3>
+                        <p>A data model is the "blueprint" that defines how your different data tables are connected. It's what allows you to filter sales by customer, even if that data lives in separate tables. You create relationships (links) between tables using common columns, like a Customer ID.</p>
+                    </div>
+
+                    <h3 class="text-2xl font-bold mb-4 text-green-300">DAX: Calculated Columns vs. Measures</h3>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div class="comparison-card bg-gray-800 p-6 rounded-lg border-t-4 border-green-500">
+                            <h4 class="text-xl font-semibold text-green-400 mb-3">Calculated Column</h4>
+                            <p class="mb-4">A new column physically added to your table. The calculation is performed for each row and the results are stored in your model.</p>
+                            <ul class="list-disc list-inside space-y-2 text-sm">
+                                <li><strong>Context:</strong> Row Context (sees only the current row)</li>
+                                <li><strong>Storage:</strong> Uses RAM and increases file size</li>
+                                <li><strong>When to Use:</strong> For static values you want to slice by, like creating a price category ('High', 'Medium', 'Low') from a price column.</li>
+                            </ul>
+                        </div>
+                        <div class="comparison-card bg-gray-800 p-6 rounded-lg border-t-4 border-green-500">
+                            <h4 class="text-xl font-semibold text-green-400 mb-3">Measure</h4>
+                            <p class="mb-4">A formula that is calculated on the fly, based on the filters applied in your report. It is not stored in your model.</p>
+                            <ul class="list-disc list-inside space-y-2 text-sm">
+                                <li><strong>Context:</strong> Filter Context (sees all filters on a visual)</li>
+                                <li><strong>Storage:</strong> Does not use RAM or increase file size</li>
+                                <li><strong>When to Use:</strong> For aggregations that need to be dynamic, like Total Sales or Average Profit. <strong>This is what you'll use most of the time!</strong></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="mt-8 bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">Your First DAX Measures</h3>
+                        <p class="mb-4">Here are some examples of fundamental DAX measures. Notice they are simple and readable.</p>
+                        <div class="space-y-3">
+                            <pre class="bg-black text-white p-3 rounded-md text-sm"><code>Total Sales = SUM(Sales[SalesAmount])</code></pre>
+                            <pre class="bg-black text-white p-3 rounded-md text-sm"><code>Order Count = COUNT(Sales[OrderNumber])</code></pre>
+                            <pre class="bg-black text-white p-3 rounded-md text-sm"><code>East Region Sales = CALCULATE([Total Sales], Sales[Region] = "East")</code></pre>
+                        </div>
+                    </div>
+                </div>
+            `,
+            module4: `
+                <div id="module4" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Module 4: Telling the Story with Visualization</h2>
+                    <p class="text-lg text-gray-400 mb-8">This is where your data comes to life. A well-designed report communicates insights clearly and effectively. The goal is to choose the right visual for the right message.</p>
+                    
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">Interactive Visual Chooser</h3>
+                        <p class="mb-6">What story do you want to tell? Click a button below to see the recommended visual and an example.</p>
+                        
+                        <div id="visual-selector" class="flex flex-wrap gap-3 mb-6">
+                            <button data-type="compare" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Compare Values</button>
+                            <button data-type="trend" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Show a Trend</button>
+                            <button data-type="part" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Part of a Whole</button>
+                            <button data-type="kpi" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Show a KPI</button>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6 items-center">
+                            <div>
+                                <h4 id="visual-title" class="text-lg font-semibold">Select a goal above</h4>
+                                <p id="visual-desc" class="mt-2 text-gray-400">The right visual depends on the question you're trying to answer.</p>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="visual-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+            module5: `
+                <div id="module5" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Module 5: Sharing Your Insights</h2>
+                    <p class="text-lg text-gray-400 mb-8">A report is only useful if the right people can see it. Learn how to publish, share, and collaborate using the Power BI Service.</p>
+
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700 mb-6">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">Reports vs. Dashboards</h3>
+                        <p class="mb-4">It's important to understand the difference between these two key elements in the Power BI Service.</p>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <h4 class="font-bold">Report</h4>
+                                <p class="text-sm">An interactive, multi-page canvas for deep-dive analysis. Users can slice, dice, and filter extensively.</p>
+                            </div>
+                            <div class="p-4 bg-gray-700 rounded-lg">
+                                <h4 class="font-bold">Dashboard</h4>
+                                <p class="text-sm">A single-page summary or highlight reel. Presents the most important KPIs for at-a-glance monitoring.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <h3 class="text-xl font-semibold text-green-400 mb-3">Sharing & Collaboration Methods</h3>
+                        <ul class="space-y-4">
+                            <li class="p-4 bg-gray-700 rounded-lg">
+                                <strong class="block">Workspaces</strong>
+                                Collaborative environments where you and your team can co-author and share reports and dashboards.
+                            </li>
+                            <li class="p-4 bg-gray-700 rounded-lg">
+                                <strong class="block">Apps</strong>
+                                The best way to distribute content to a wide audience. Bundle related reports into a polished, professional package for consumers.
+                            </li>
+                            <li class="p-4 bg-gray-700 rounded-lg">
+                                <strong class="block">Scheduled Refresh</strong>
+                                Configure your dataset in the Service to automatically refresh, ensuring your reports are always up-to-date.
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            `,
+            lab: `
+                <div id="lab" class="content-fade-in">
+                    <h2 class="text-3xl font-bold mb-2 text-green-300">Hands-On Lab: Build a Sales Summary</h2>
+                    <p class="text-lg text-gray-400 mb-8">Time to apply what you've learned! Follow the steps below to create a one-page Sales Summary report using the provided sample data.</p>
+                    
+                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
+                        <div class="mb-4">
+                            <div class="w-full bg-gray-700 rounded-full h-2.5">
+                                <div id="progress-bar" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
+                            </div>
+                            <p id="progress-text" class="text-center text-sm mt-2">0% Complete</p>
+                        </div>
+
+                        <div id="task-list" class="space-y-3">
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">Connect to the \`Sample_Sales_Data.xlsx\` file.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">In Power Query: Check data types and remove any error rows.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">In Data Model: Ensure relationships are set up correctly.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">DAX: Create measures for \`Total Sales\` and \`Total Profit\`.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">Visualize: Add a card for Total Sales.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">Visualize: Add a bar chart for Sales by Product Category.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">Visualize: Add a line chart for Sales over Time.</span>
+                            </label>
+                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
+                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
+                                <span class="ml-3 text-gray-300">Visualize: Add a slicer to filter by Region.</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            `
+        };
+
+        const contentArea = document.getElementById('content-area');
+        const navLinks = document.querySelectorAll('#sidebar-nav a');
+        let chartInstance = null;
+
+        Chart.defaults.color = '#a0aec0';
+        Chart.defaults.borderColor = '#4a5568';
+
+        function navigate() {
+            const hash = window.location.hash || '#module1';
+            const contentKey = hash.substring(1);
+
+            if (content[contentKey]) {
+                contentArea.innerHTML = content[contentKey];
+                updateActiveLink(hash);
+                initializeModuleScripts(contentKey);
+            }
+        }
+
+        function updateActiveLink(activeHash) {
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') === activeHash) {
+                    link.classList.add('active');
+                } else {
+                    link.classList.remove('active');
+                }
+            });
+        }
+
+        function initializeModuleScripts(moduleKey) {
+            if (moduleKey === 'module2') {
+                setupWorkflowInteraction();
+            }
+            if (moduleKey === 'module4') {
+                setupVisualChooser();
+            }
+            if (moduleKey === 'lab') {
+                setupLabChecklist();
+            }
+        }
+
+        function setupWorkflowInteraction() {
+            const steps = document.querySelectorAll('.workflow-step');
+            const detailsBox = document.getElementById('workflow-details');
+            const detailsContent = {
+                'step-1': 'Connect to your data sources, like Excel files, databases, or web pages.',
+                'step-2': 'Clean, shape, and prepare your data for analysis using the Power Query Editor.',
+                'step-3': 'Create relationships between your tables to build a coherent data model.',
+                'step-4': 'Create charts, graphs, and maps to represent the data and uncover insights.',
+                'step-5': 'Share your findings with colleagues by publishing to the Power BI Service.'
+            };
+            steps.forEach(step => {
+                step.addEventListener('click', () => {
+                    detailsBox.textContent = detailsContent[step.id];
+                    detailsBox.classList.remove('hidden');
+                    steps.forEach(s => s.classList.replace('bg-green-700', 'bg-gray-700'));
+                    step.classList.replace('bg-gray-700', 'bg-green-700');
+                });
+            });
+        }
+
+        function setupVisualChooser() {
+            const visualData = {
+                compare: {
+                    title: 'Bar/Column Chart',
+                    desc: 'Best for comparing values across different categories. Use a column chart for fewer categories and a bar chart for many.',
+                    type: 'bar',
+                    data: {
+                        labels: ['Category A', 'Category B', 'Category C', 'Category D'],
+                        datasets: [{ label: 'Sales', data: [450, 620, 510, 750], backgroundColor: '#22c55e' }]
+                    },
+                    options: { scales: { y: { beginAtZero: true, grid: { color: '#4a5568' } }, x: { grid: { color: '#4a5568' } } } }
+                },
+                trend: {
+                    title: 'Line Chart',
+                    desc: 'Perfect for showing trends and changes over a continuous period, like time.',
+                    type: 'line',
+                    data: {
+                        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+                        datasets: [{ label: 'Profit', data: [120, 190, 150, 210, 180, 240], borderColor: '#34d399', tension: 0.1 }]
+                    },
+                    options: { scales: { y: { grid: { color: '#4a5568' } }, x: { grid: { color: '#4a5568' } } } }
+                },
+                part: {
+                    title: 'Donut Chart',
+                    desc: 'Use sparingly to show the proportions of a whole. Best when there are 6 or fewer categories.',
+                    type: 'doughnut',
+                    data: {
+                        labels: ['North', 'South', 'East', 'West'],
+                        datasets: [{ label: 'Market Share', data: [300, 50, 100, 80], backgroundColor: ['#10b981', '#34d399', '#6ee7b7', '#a7f3d0'] }]
+                    },
+                    options: {}
+                },
+                kpi: {
+                    title: 'Card & Gauge',
+                    desc: 'The Card is perfect for displaying a single, important number (KPI). A Gauge can show that number relative to a target.',
+                    type: 'bar', 
+                    data: {
+                        labels: ['Total Revenue'],
+                        datasets: [{ label: 'Revenue ($M)', data: [8.2], backgroundColor: '#84cc16', maxBarThickness: 100 }]
+                    },
+                    options: { indexAxis: 'y', plugins: { legend: { display: false }}, scales: { x: { max: 10, grid: { color: '#4a5568' } }, y: { grid: { color: '#2d3748' } } } }
+                }
+            };
+
+            const ctx = document.getElementById('visual-chart').getContext('2d');
+            const titleEl = document.getElementById('visual-title');
+            const descEl = document.getElementById('visual-desc');
+
+            document.getElementById('visual-selector').addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const type = e.target.dataset.type;
+                    const config = visualData[type];
+
+                    titleEl.textContent = config.title;
+                    descEl.textContent = config.desc;
+                    
+                    if (chartInstance) {
+                        chartInstance.destroy();
+                    }
+
+                    chartInstance = new Chart(ctx, {
+                        type: config.type,
+                        data: config.data,
+                        options: { ...config.options, maintainAspectRatio: false, responsive: true }
+                    });
+                }
+            });
+        }
+
+        function setupLabChecklist() {
+            const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            const totalTasks = checkboxes.length;
+
+            function updateProgress() {
+                const checkedTasks = document.querySelectorAll('#task-list input[type="checkbox"]:checked').length;
+                const percentage = totalTasks > 0 ? Math.round((checkedTasks / totalTasks) * 100) : 0;
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = `${percentage}% Complete (${checkedTasks}/${totalTasks})`;
+            }
+            
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', updateProgress);
+            });
+
+            updateProgress();
+        }
+
+        window.addEventListener('hashchange', navigate);
+        window.addEventListener('DOMContentLoaded', navigate);
+
+    </script>
+
+    </body>
+    </html>
