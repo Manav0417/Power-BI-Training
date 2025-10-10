@@ -165,7 +165,7 @@ function setupVisualChooser() {
     part: { title: 'Donut Chart', desc: 'Show proportions.', type: 'doughnut',
       data: { labels:['North','South'], datasets: [{ data:[300,200], backgroundColor:['#10b981','#34d399'] }] } },
     kpi: { title: 'Card/Gauge', desc: 'Show a KPI.', type: 'bar',
-      data: { labels:['Revenue'], datasets: [{ data:[8.2], backgroundColor:'#84cc16' }] },
+      data: { labels:['Revenue'], datasets: [{ data:[9.5], backgroundColor:'#16cca8ff' }] },
       options: { indexAxis:'y', plugins:{legend:{display:false}}, scales:{x:{max:10}} } }
   };
 
@@ -185,20 +185,91 @@ function setupVisualChooser() {
   });
 }
 
-function setupLabChecklist() {
-  const checkboxes = document.querySelectorAll('#task-list input[type="checkbox"]');
-  const progressBar = document.getElementById('progress-bar');
-  const progressText = document.getElementById('progress-text');
-  function updateProgress() {
-    const checked = document.querySelectorAll('#task-list input:checked').length;
-    const total = checkboxes.length;
-    const percent = total > 0 ? Math.round((checked / total) * 100) : 0;
-    progressBar.style.width = percent + '%';
-    progressText.textContent = `${percent}% Complete (${checked}/${total})`;
-  }
-  checkboxes.forEach(cb => cb.addEventListener('change', updateProgress));
-  updateProgress();
-}
+function setupVisualChooser() {
+  const visualData = {
+    compare: { title: 'Bar Chart', desc: 'Compare categories.', type: 'bar',
+      data: { labels: ['A','B','C'], datasets: [{ data:[450,620,510], backgroundColor:'#22c55e' }] } },
+    trend: { title: 'Line Chart', desc: 'Show trends over time.', type: 'line',
+      data: { labels: ['Jan','Feb','Mar'], datasets: [{ data:[120,190,150], borderColor:'#34d399' }] } },
+    part: { title: 'Donut Chart', desc: 'Show proportions.', type: 'doughnut',
+      data: { labels:['North','South'], datasets: [{ data:[300,200], backgroundColor:['#10b981','#34d399'] }] } },
+    kpi: { title: 'Card & Gauge', desc: 'Show a KPI.', isCard: true,
+      cardData: { value: '5,441', label: 'Avg temp - lower than last...', change: '-0.2', sparklineData: [5.2, 5.3, 5.1, 5.4, 5.5, 5.3, 5.4, 5.6, 5.4, 5.5, 5.4, 5.41] ,backgroundColor:['#10b981','#34d399']} }
+  };
 
-window.addEventListener('hashchange', navigate);
-window.addEventListener('DOMContentLoaded', navigate);
+  const chartContainer = document.querySelector('.chart-container');
+  const titleEl = document.getElementById('visual-title');
+  const descEl = document.getElementById('visual-desc');
+
+  document.getElementById('visual-selector').addEventListener('click', (e) => {
+    if (e.target.tagName === 'BUTTON') {
+      const type = e.target.dataset.type;
+      const config = visualData[type];
+      titleEl.textContent = config.title;
+      descEl.textContent = config.desc;
+      
+      if (config.isCard) {
+        // Destroy chart if exists
+        if (chartInstance) {
+          chartInstance.destroy();
+          chartInstance = null;
+        }
+        
+        // Create KPI Card
+        const card = config.cardData;
+        
+        chartContainer.innerHTML = `
+          <div class="bg-white rounded-lg p-6 border-l-4 border-gray-800 shadow-lg" style="max-width: 350px;">
+            <div class="text-sm text-gray-600 mb-3">${card.label}</div>
+            <div class="flex items-start justify-between">
+              <div class="text-5xl font-bold text-gray-900">${card.value}</div>
+              <div class="text-right">
+                <div class="text-gray-500 text-sm mb-1">${card.change}</div>
+                <canvas id="sparkline-chart" width="120" height="40"></canvas>
+              </div>
+            </div>
+          </div>
+        `;
+        
+        // Create sparkline
+        setTimeout(() => {
+          const sparkCtx = document.getElementById('sparkline-chart').getContext('2d');
+          new Chart(sparkCtx, {
+            type: 'line',
+            data: {
+              labels: card.sparklineData.map((_, i) => i),
+              datasets: [{
+                data: card.sparklineData,
+                borderColor: '#4a5568',
+                backgroundColor: 'rgba(74, 85, 104, 0.1)',
+                borderWidth: 2,
+                fill: true,
+                tension: 0.4,
+                pointRadius: 0,
+                pointHoverRadius: 0
+              }]
+            },
+            options: {
+              responsive: false,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+              },
+              scales: {
+                x: { display: false },
+                y: { display: false }
+              }
+            }
+          });
+        }, 100);
+      } else {
+        // Create chart
+        chartContainer.innerHTML = '<canvas id="visual-chart"></canvas>';
+        const ctx = document.getElementById('visual-chart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, { type: config.type, data: config.data, options: config.options || {} });
+      }
+    }
+  });
+}
