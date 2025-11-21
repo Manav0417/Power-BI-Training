@@ -89,7 +89,7 @@ const content = {
   module6: `
 <div id="module6" class="content-fade-in">
 
-    <h2 class="text-3xl font-bold mb-4 text-green-300">Module 6: DAX Functions</h2>
+    <h2 class="text-3xl font-bold mb-4 text-green-300">DAX Functions</h2>
     <p class="text-lg text-gray-400 mb-8">
         These are the most commonly used DAX functions you will use on a daily basis in Power BI. 
         Each example is simple, practical, and easy to understand.
@@ -436,3 +436,4 @@ function setupVisualChooser() {
     }
   });
 }
+
