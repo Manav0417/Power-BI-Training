@@ -86,24 +86,192 @@ const content = {
       </div>
     </div>
   `,
-  lab: `
-    <div id="lab" class="content-fade-in">
-      <h2 class="text-3xl font-bold mb-2 text-green-300">Hands-On Lab</h2>
-      <p class="text-lg text-gray-400 mb-8">Follow these steps to build a Sales Summary report.</p>
-      <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-        <div class="w-full bg-gray-700 rounded-full h-2.5 mb-4">
-          <div id="progress-bar" class="bg-green-600 h-2.5 rounded-full" style="width:0%"></div>
+  module6: `
+<div id="module6" class="content-fade-in">
+
+    <h2 class="text-3xl font-bold mb-4 text-green-300">Module 6: DAX Functions</h2>
+    <p class="text-lg text-gray-400 mb-8">
+        These are the most commonly used DAX functions you will use on a daily basis in Power BI. 
+        Each example is simple, practical, and easy to understand.
+    </p>
+
+    <!-- ============================= -->
+    <!-- CALCULATED COLUMN FUNCTIONS   -->
+    <!-- ============================= -->
+
+    <h3 class="text-2xl font-bold text-green-400 mb-4">Calculated Column Functions</h3>
+
+    <div class="space-y-6">
+
+        <!-- IF() -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">1. IF()</h4>
+            <p class="text-gray-300 mb-2">Applies a condition and returns values based on TRUE/FALSE.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">Status = IF(Sales[Amount] > 50000, "High", "Low")</pre>
         </div>
-        <p id="progress-text" class="text-center text-sm mb-4">0% Complete</p>
-        <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg mb-2">
-          <input type="checkbox"><span class="ml-3">Connect to Sample_Sales_Data.xlsx</span>
-        </label>
-        <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg mb-2">
-          <input type="checkbox"><span class="ml-3">Clean data in Power Query</span>
-        </label>
-      </div>
+
+        <!-- SWITCH() -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">2. SWITCH()</h4>
+            <p class="text-gray-300 mb-2">Cleaner alternative to multiple IF statements.</p>
+<pre class="bg-black text-green-400 p-3 rounded text-sm">
+Rating = SWITCH(TRUE(),
+    Sales[Amount] > 50000, "A",
+    Sales[Amount] > 30000, "B",
+    "C")
+</pre>
+        </div>
+
+        <!-- CONCATENATE / & -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">3. CONCATENATE() / &</h4>
+            <p class="text-gray-300 mb-2">Combines text fields.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">FullName = Employee[FirstName] & " " & Employee[LastName]</pre>
+        </div>
+
+        <!-- LEFT RIGHT MID -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">4. LEFT(), RIGHT(), MID()</h4>
+            <p class="text-gray-300 mb-2">Extract parts of a text value.</p>
+<pre class="bg-black text-green-400 p-3 rounded text-sm">
+Year = LEFT(Invoice[InvoiceID], 4)
+Code = RIGHT(Product[SKU], 3)
+MiddleText = MID(Product[Code], 2, 4)
+</pre>
+        </div>
+
+        <!-- FORMAT -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">5. FORMAT()</h4>
+            <p class="text-gray-300 mb-2">Converts dates or numbers into readable text.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">MonthName = FORMAT(Sales[Date], "MMM")</pre>
+        </div>
+
+        <!-- VALUE -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">6. VALUE()</h4>
+            <p class="text-gray-300 mb-2">Converts text into a numeric value.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">AmountNum = VALUE(Sales[AmountText])</pre>
+        </div>
+
+        <!-- DATEDIFF -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">7. DATEDIFF()</h4>
+            <p class="text-gray-300 mb-2">Calculates difference between two dates/times.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">AgeInDays = DATEDIFF(Employee[JoinDate], TODAY(), DAY)</pre>
+        </div>
+
+        <!-- YEAR MONTH DAY -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">8. YEAR(), MONTH(), DAY()</h4>
+            <p class="text-gray-300 mb-2">Extracts a part of a date.</p>
+            <pre class="bg-black text-green-400 p-3 rounded text-sm">SalesYear = YEAR(Sales[Date])</pre>
+        </div>
+
+        <!-- LOOKUPVALUE -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500">
+            <h4 class="text-xl font-semibold text-green-300">9. LOOKUPVALUE()</h4>
+            <p class="text-gray-300 mb-2">Finds a value from another table based on lookup.</p>
+<pre class="bg-black text-green-400 p-3 rounded text-sm">
+PartName = LOOKUPVALUE(
+    Parts[Name],
+    Parts[PartID],
+    Inventory[PartID]
+)
+</pre>
+        </div>
+
     </div>
-  `
+
+    <!-- ============================= -->
+    <!-- MEASURE FUNCTIONS             -->
+    <!-- ============================= -->
+
+    <h3 class="text-2xl font-bold text-green-400 mt-10 mb-4">Measure Functions</h3>
+
+    <div class="space-y-6">
+
+        <!-- SUM -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">1. SUM()</h4>
+            <p class="text-gray-300 mb-2">Adds all numeric values.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Total Sales = SUM(Sales[Amount])</pre>
+        </div>
+
+        <!-- AVERAGE -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">2. AVERAGE()</h4>
+            <p class="text-gray-300 mb-2">Returns average of a column.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Average Cost = AVERAGE(Material[Cost])</pre>
+        </div>
+
+        <!-- COUNT / DISTINCTCOUNT -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">3. COUNT() / DISTINCTCOUNT()</h4>
+            <p class="text-gray-300 mb-2">Counts rows or unique values.</p>
+<pre class="bg-black text-blue-300 p-3 rounded text-sm">
+Total Orders = COUNT(Sales[OrderID])
+Unique Machines = DISTINCTCOUNT(Machine[MachineID])
+</pre>
+        </div>
+
+        <!-- DIVIDE -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">4. DIVIDE()</h4>
+            <p class="text-gray-300 mb-2">Safe division used for % calculations.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Rejection % = DIVIDE([RejectedQty], [TotalQty])</pre>
+        </div>
+
+        <!-- CALCULATE -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">5. CALCULATE()</h4>
+            <p class="text-gray-300 mb-2">Most important DAX function. Changes filter context.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">East Sales = CALCULATE([Total Sales], Sales[Region] = "East")</pre>
+        </div>
+
+        <!-- FILTER -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">6. FILTER()</h4>
+            <p class="text-gray-300 mb-2">Filters rows inside CALCULATE.</p>
+<pre class="bg-black text-blue-300 p-3 rounded text-sm">
+High Downtime =
+CALCULATE(
+  [Total Breakdown Hrs],
+  FILTER(Breakdown, Breakdown[Hours] > 2)
+)
+</pre>
+        </div>
+
+        <!-- ALL -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">7. ALL()</h4>
+            <p class="text-gray-300 mb-2">Removes filters (used for % of total).</p>
+<pre class="bg-black text-blue-300 p-3 rounded text-sm">
+Sales % =
+DIVIDE(
+  [Total Sales],
+  CALCULATE([Total Sales], ALL(Sales))
+)
+</pre>
+        </div>
+
+        <!-- SUMX -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">8. SUMX()</h4>
+            <p class="text-gray-300 mb-2">Row-by-row calculation.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Energy Cost = SUMX(Power, Power[Units] * Power[Rate])</pre>
+        </div>
+
+        <!-- MAX MIN -->
+        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
+            <h4 class="text-xl font-semibold text-blue-300">9. MAX() / MIN()</h4>
+            <p class="text-gray-300 mb-2">Returns highest or lowest value.</p>
+            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Max Output = MAX(Production[Units])</pre>
+        </div>
+
+    </div>
+</div>
+`
 };
 
 // ---- Core Navigation & Features ----
