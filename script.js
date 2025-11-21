@@ -255,12 +255,7 @@ DIVIDE(
 </pre>
         </div>
 
-        <!-- SUMX -->
-        <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
-            <h4 class="text-xl font-semibold text-blue-300">8. SUMX()</h4>
-            <p class="text-gray-300 mb-2">Row-by-row calculation.</p>
-            <pre class="bg-black text-blue-300 p-3 rounded text-sm">Energy Cost = SUMX(Power, Power[Units] * Power[Rate])</pre>
-        </div>
+        
 
         <!-- MAX MIN -->
         <div class="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500">
