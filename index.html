@@ -163,10 +163,11 @@
                         <span class="nav-icon inline-block w-6 mr-3">🚀</span>
                         <span class="nav-text">Module 5: Sharing Insights</span>
                     </a>
-                    <a href="#lab" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
-                        <span class="nav-icon inline-block w-6 mr-3">⚡</span>
-                        <span class="nav-text">Hands-On Lab</span>
+                    <a href="#module6" class="sidebar-item block py-3 px-6 text-gray-300 hover:bg-gray-700 transition-all duration-300">
+                        <span class="nav-icon inline-block w-6 mr-3">🧮</span>
+                        <span class="nav-text">Module 6: DAX Functions</span>
                     </a>
+
                 </nav>
             </aside>
 
@@ -398,56 +399,88 @@
                     </div>
                 </div>
             `,
-            lab: `
-                <div id="lab" class="content-fade-in">
-                    <h2 class="text-3xl font-bold mb-2 text-green-300">Hands-On Lab: Build a Sales Summary</h2>
-                    <p class="text-lg text-gray-400 mb-8">Time to apply what you've learned! Follow the steps below to create a one-page Sales Summary report using the provided sample data.</p>
-                    
-                    <div class="bg-gray-800 p-6 rounded-lg border border-gray-700">
-                        <div class="mb-4">
-                            <div class="w-full bg-gray-700 rounded-full h-2.5">
-                                <div id="progress-bar" class="bg-green-600 h-2.5 rounded-full" style="width: 0%"></div>
-                            </div>
-                            <p id="progress-text" class="text-center text-sm mt-2">0% Complete</p>
-                        </div>
+            
+module6: `
+    <div id="module6" class="content-fade-in">
+        <h2 class="text-3xl font-bold mb-4 text-green-300">Module 6: DAX Functions</h2>
+        <p class="text-gray-400 mb-6">Frequently used DAX functions for Calculated Columns and Measures.</p>
 
-                        <div id="task-list" class="space-y-3">
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Understand the requiremnet & Data.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Connect data with Power BI.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">In Power Query: Check data types and remove any error rows.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">In Data Model: Ensure relationships are set up correctly.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Create Measure or Calculated column if required.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Visualize: Add a bar chart for Sales by Product Category.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Visualize: Add a line chart for Sales over Time.</span>
-                            </label>
-                            <label class="task-list-item flex items-center p-3 bg-gray-700 rounded-lg hover:bg-gray-600 cursor-pointer">
-                                <input type="checkbox" class="h-4 w-4 rounded border-gray-500 bg-gray-600 text-green-500 focus:ring-green-600">
-                                <span class="ml-3 text-gray-300">Publish & Share the report.</span>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            `
+        <h3 class="text-2xl text-green-400 mb-3">Calculated Column Functions</h3>
+
+        <div class="space-y-4">
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+                <h4 class="text-green-300 font-semibold mb-1">IF()</h4>
+                <p class="text-gray-300 text-sm mb-2">Row-level conditional logic.</p>
+                <pre class="bg-black text-green-400 p-2 rounded text-sm">
+Status = IF(Sales[Amount] > 50000, "High", "Low")
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+                <h4 class="text-green-300 font-semibold mb-1">SWITCH()</h4>
+                <p class="text-gray-300 text-sm mb-2">Cleaner alternative to multiple IFs.</p>
+                <pre class="bg-black text-green-400 p-2 rounded text-sm">
+Rating =
+SWITCH(TRUE(),
+  Sales[Amount] > 50000, "A",
+  Sales[Amount] > 30000, "B",
+  "C")
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+                <h4 class="text-green-300 font-semibold mb-1">CONCATENATE() / &</h4>
+                <pre class="bg-black text-green-400 p-2 rounded text-sm">
+FullName = Employee[FirstName] & " " & Employee[LastName]
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-green-500">
+                <h4 class="text-green-300 font-semibold mb-1">LEFT(), RIGHT(), MID()</h4>
+                <pre class="bg-black text-green-400 p-2 rounded text-sm">
+Year = LEFT(Invoice[InvoiceID], 4)
+                </pre>
+            </div>
+
+        </div>
+
+        <h3 class="text-2xl text-blue-400 mt-8 mb-3">Measure Functions</h3>
+
+        <div class="space-y-4">
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
+                <h4 class="text-blue-300 font-semibold mb-1">SUM()</h4>
+                <pre class="bg-black text-blue-300 p-2 rounded text-sm">
+Total Sales = SUM(Sales[Amount])
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
+                <h4 class="text-blue-300 font-semibold mb-1">DIVIDE()</h4>
+                <pre class="bg-black text-blue-300 p-2 rounded text-sm">
+Rejection % = DIVIDE([RejectedQty], [TotalQty])
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
+                <h4 class="text-blue-300 font-semibold mb-1">CALCULATE()</h4>
+                <pre class="bg-black text-blue-300 p-2 rounded text-sm">
+East Sales = CALCULATE([Total Sales], Sales[Region] = "East")
+                </pre>
+            </div>
+
+            <div class="bg-gray-800 p-4 rounded border-l-4 border-blue-500">
+                <h4 class="text-blue-300 font-semibold mb-1">SUMX()</h4>
+                <pre class="bg-black text-blue-300 p-2 rounded text-sm">
+Energy Cost = SUMX(Power, Power[Units] * Power[Rate])
+                </pre>
+            </div>
+
+        </div>
+    </div>
+`
+
         };
 
         const contentArea = document.getElementById('content-area');
